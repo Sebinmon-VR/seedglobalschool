@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Gallery & Videos | SEED Global School</title>
+  <meta name="description" content="Photos, prize winners and videos from life at SEED Global School." />
+  <meta name="theme-color" content="#0c2f2a" />
+  <meta property="og:title" content="Gallery & Videos | SEED Global School" />
+  <meta property="og:description" content="Photos, prize winners and videos from life at SEED Global School." />
+  <meta property="og:image" content="assets/img/gallery/yoga-day.webp" />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body class="page journey-page page--gallery">
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+<!-- @include header.html -->
+
+  <main id="main">
+    <section class="chapter chapter--hero chapter--page" id="top" data-stage="galleryHero" data-theme="dark" data-side="left" data-name="Gallery">
+      <div class="frame">
+        <div class="caption caption--hero">
+          <nav class="crumbs" aria-label="Breadcrumb" data-hero><a href="index.html">Home</a><span>/</span><span aria-current="page">Gallery</span></nav>
+          <h1 class="display display--hero display--page" data-hero-title>
+            <span class="line">Moments that</span>
+            <span class="line"><em>bloomed</em></span>
+          </h1>
+          <p class="lede" data-hero>Celebrations, culture, sport and stage. A glimpse of everyday life and the special days at SEED.</p>
+          <div class="actions" data-hero><a class="btn btn--gold" href="#photos">Photo gallery</a><a class="btn btn--line" href="#videos">Watch videos</a></div>
+        </div>
+        <p class="scroll-hint" data-hero><span class="scroll-hint__line"></span>Scroll to explore</p>
+      </div>
+    </section>
+    <section class="chapter chapter--last" id="stage" data-stage="canopy" data-theme="dark" data-side="right" data-name="On stage" data-arrive="0.2" data-leave="1">
+      <div class="frame"><div class="caption">
+        <p class="kicker"><span class="kicker__num">01</span>Achievements</p>
+        <h2 class="display" data-split>Prize winners <em>on stage</em></h2>
+        <ul class="mini-levels" data-reveal>
+          <li><strong>Oppana</strong><span>First prize · KPSA Kalotsav 2022</span></li>
+          <li><strong>Group Song (LP)</strong><span>First prize, A grade · Sub-District 2022–23</span></li>
+          <li><strong>Patriotic Song</strong><span>Second prize · KPSA Kalotsav 2022</span></li>
+          <li><strong>SEED Talks</strong><span>Young speakers on stage</span></li>
+        </ul>
+        <a class="link-arrow" href="#achievements" data-reveal>See the prize posters</a>
+      </div></div>
+    </section>
+
+
+    <section class="section" id="photos">
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Photo gallery</p><h2 class="section-title" data-split>Life at <em>SEED</em></h2></div>
+          <div class="filters" role="group" aria-label="Filter photos" data-reveal>
+            <button class="is-on" data-filter="all">All</button>
+            <button data-filter="celebrations">Celebrations</button>
+            <button data-filter="wellness">Wellness &amp; nature</button>
+            <button data-filter="learning">Learning</button>
+          </div>
+        </header>
+        <div class="grid" id="photo-grid">
+          <figure class="tile" data-cat="wellness" data-reveal><button data-full="assets/img/gallery/yoga-day.webp"><img src="assets/img/gallery/yoga-day.webp" alt="Students practising yoga on International Yoga Day" loading="lazy" /></button><figcaption>International Yoga Day</figcaption></figure>
+          <figure class="tile" data-cat="celebrations" data-reveal><button data-full="assets/img/gallery/mont-opening-day-1.webp"><img src="assets/img/gallery/mont-opening-day-1.webp" alt="Montessori opening day" loading="lazy" /></button><figcaption>Montessori Opening Day</figcaption></figure>
+          <figure class="tile" data-cat="wellness" data-reveal><button data-full="assets/img/gallery/world-enviroment-day-5.webp"><img src="assets/img/gallery/world-enviroment-day-5.webp" alt="World Environment Day" loading="lazy" /></button><figcaption>World Environment Day</figcaption></figure>
+          <figure class="tile" data-cat="celebrations" data-reveal><button data-full="assets/img/gallery/mont-opening-day-2.webp"><img src="assets/img/gallery/mont-opening-day-2.webp" alt="First day smiles" loading="lazy" /></button><figcaption>First-day Smiles</figcaption></figure>
+          <figure class="tile" data-cat="learning" data-reveal><button data-full="assets/img/gallery/reading-day.webp"><img src="assets/img/gallery/reading-day.webp" alt="Reading Day" loading="lazy" /></button><figcaption>Reading Day</figcaption></figure>
+          <figure class="tile" data-cat="celebrations" data-reveal><button data-full="assets/img/gallery/childrens-day-3.webp"><img src="assets/img/gallery/childrens-day-3.webp" alt="Children's Day" loading="lazy" /></button><figcaption>Children's Day</figcaption></figure>
+          <figure class="tile" data-cat="wellness" data-reveal><button data-full="assets/img/gallery/say-no-to-drugs-1.webp"><img src="assets/img/gallery/say-no-to-drugs-1.webp" alt="Say No to Drugs campaign" loading="lazy" /></button><figcaption>Say No to Drugs</figcaption></figure>
+          <figure class="tile" data-cat="celebrations" data-reveal><button data-full="assets/img/gallery/honouring-ceremony.webp"><img src="assets/img/gallery/honouring-ceremony.webp" alt="Honouring ceremony" loading="lazy" /></button><figcaption>Honouring Ceremony</figcaption></figure>
+          <figure class="tile" data-cat="wellness" data-reveal><button data-full="assets/img/gallery/world-environment-day-4.webp"><img src="assets/img/gallery/world-environment-day-4.webp" alt="Planting on World Environment Day" loading="lazy" /></button><figcaption>Planting Together</figcaption></figure>
+          <figure class="tile" data-cat="learning" data-reveal><button data-full="assets/img/gallery/parent-orientation-1.webp"><img src="assets/img/gallery/parent-orientation-1.webp" alt="Parent orientation" loading="lazy" /></button><figcaption>Parent Orientation</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--tint" id="achievements">
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Achievements</p><h2 class="section-title" data-split>Prize winners <em>on stage</em></h2></div>
+          <p class="section-head__text" data-reveal>Honours from the KPSA Kalotsav and the Ponnani Sub-District School Kalolsavam.</p>
+        </header>
+        <div class="achievements__row">
+          <figure class="poster" data-reveal><button data-full="assets/img/gallery/oppana.webp"><img src="assets/img/gallery/oppana.webp" alt="KPSA Kalotsav 2022 first prize poster, Oppana" loading="lazy" /></button><figcaption><span class="medal">First prize</span><strong>Oppana</strong>KPSA Kalotsav 2022</figcaption></figure>
+          <figure class="poster" data-reveal><button data-full="assets/img/gallery/group-song.webp"><img src="assets/img/gallery/group-song.webp" alt="Ponnani Sub-District Kalolsavam first prize A grade poster, Group Song" loading="lazy" /></button><figcaption><span class="medal">First prize · A grade</span><strong>Group Song (LP)</strong>Sub-District Kalolsavam 2022–23</figcaption></figure>
+          <figure class="poster" data-reveal><button data-full="assets/img/gallery/patriotic-song.webp"><img src="assets/img/gallery/patriotic-song.webp" alt="KPSA Kalotsav 2022 second prize poster, Patriotic Song" loading="lazy" /></button><figcaption><span class="medal medal--silver">Second prize</span><strong>Patriotic Song</strong>KPSA Kalotsav 2022</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--cinema" id="videos">
+      <div class="container cinema">
+        <div class="cinema__side">
+          <p class="kicker">Videos</p>
+          <h2 class="section-title" data-split>SEED <em>in motion</em></h2>
+          <ol class="episodes" id="episodes">
+              <li><button class="is-on" data-id="3yDhLbob-_c" data-thumb="https://i.ytimg.com/vi/3yDhLbob-_c/maxresdefault.jpg" data-zoom><span>01</span><strong>Onam Celebration</strong><em>2020</em></button></li>
+              <li><button data-id="WmPX3J55xXo" data-thumb="assets/img/primary.webp"><span>02</span><strong>Convocation Ceremony</strong><em>2019</em></button></li>
+              <li><button data-id="XapMkENukXU" data-thumb="https://i.ytimg.com/vi/XapMkENukXU/maxresdefault.jpg"><span>03</span><strong>Azadi Ka Amrit Mahotsav</strong><em>Independence Day</em></button></li>
+              <li><button data-id="ZUacxV983g8" data-thumb="https://i.ytimg.com/vi/ZUacxV983g8/hqdefault.jpg"><span>04</span><strong>Maths Exhibition</strong><em>2019</em></button></li>
+              <li><button data-id="el4vC522at8" data-thumb="https://i.ytimg.com/vi/el4vC522at8/hqdefault.jpg"><span>05</span><strong>Kerala Piravi</strong><em>2019</em></button></li>
+              <li><button data-id="VkRiHFg5K5g" data-thumb="https://i.ytimg.com/vi/VkRiHFg5K5g/hqdefault.jpg"><span>06</span><strong>Say No to Drugs: a mime</strong><em>By young Seedlers</em></button></li>
+          </ol>
+          <a class="link-arrow link-arrow--light" href="https://www.youtube.com/channel/UCR3sSXCFX-BKe8i7DF6kHug" target="_blank" rel="noopener">More on our YouTube channel</a>
+        </div>
+        <div class="cinema__screen" id="screen" data-reveal>
+          <button class="screen__poster" id="screen-poster" aria-label="Play video">
+            <img id="screen-thumb" class="is-zoom" src="https://i.ytimg.com/vi/3yDhLbob-_c/maxresdefault.jpg" alt="" />
+            <span class="screen__play" aria-hidden="true"></span>
+            <span class="screen__title"><small>Now showing</small><span id="screen-title">Onam Celebration · 2020</span></span>
+          </button>
+        </div>
+      </div>
+      <div class="container follow">
+        <p>Follow our story</p>
+        <div class="follow__links">
+          <a href="https://www.instagram.com/seedglobalschool/" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://www.facebook.com/seedglobalschool" target="_blank" rel="noopener">Facebook</a>
+          <a href="https://www.youtube.com/channel/UCR3sSXCFX-BKe8i7DF6kHug" target="_blank" rel="noopener">YouTube</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+<!-- @include footer.html -->
+  <script type="module" src="/src/page.js"></script>
+</body>
+</html>
