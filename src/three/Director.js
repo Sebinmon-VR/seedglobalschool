@@ -133,15 +133,16 @@ export class Director {
   }
 
   /**
-   * Desktop: each chapter is a pinned "frame". The stage is reached shortly
-   * after the frame pins (arrive), held while the visitor reads, then the tree
-   * grows on toward the next stage (leave → next arrive).
-   * Mobile: one keyframe per chapter, reached while its open window is on screen.
+   * Pinned chapters (desktop, and the home page on phones): each chapter is a
+   * sticky "frame". The stage is reached shortly after the frame pins (arrive),
+   * held while the visitor reads, then the tree grows on toward the next stage
+   * (leave → next arrive).
+   * Unpinned chapters (inner pages on phones): one keyframe per chapter,
+   * reached while its open window is on screen.
    */
   measure() {
     const vh = window.innerHeight;
     const max = Math.max(1, document.documentElement.scrollHeight - vh);
-    const narrow = window.innerWidth < 900;
     this.max = max;
     const keys = [];
     this.anchors = [];
@@ -152,7 +153,9 @@ export class Director {
         this.anchors.push(0);
         return;
       }
-      if (narrow) {
+      const frame = el.querySelector('.frame');
+      const pinned = frame && getComputedStyle(frame).position === 'sticky';
+      if (!pinned) {
         const y = top + vh * 0.1;
         keys.push({ y, i });
         this.anchors.push(y);

@@ -136,12 +136,14 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
         },
       });
     });
-    // Desktop only: chapters are pinned, so each caption (and the wash behind it)
-    // fades as the tree moves on to the next stage. On phones nothing is pinned and
-    // captions simply scroll past, so they stay fully visible while being read.
-    gsap.matchMedia().add('(min-width: 901px)', () => {
+    // Pinned chapters (desktop, and the home page on phones): each caption (and the
+    // wash behind it) holds while it is read, then fades as the tree moves on to the
+    // next stage. Unpinned chapters (inner pages on phones) simply scroll past, so
+    // their captions stay fully visible. Re-evaluated when crossing the breakpoint.
+    gsap.matchMedia().add({ wide: '(min-width: 901px)', narrow: '(max-width: 900px)' }, () => {
       sections.forEach((chapter, i) => {
         if (i === sections.length - 1) return;
+        if (getComputedStyle(chapter.querySelector('.frame')).position !== 'sticky') return;
         const leave = Number(chapter.dataset.leave ?? 0.68);
         const st = {
           trigger: chapter,
