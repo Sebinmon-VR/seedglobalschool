@@ -188,23 +188,6 @@ export class Island {
       rock.receiveShadow = shadows;
       this.group.add(rock);
     }
-
-    /* ---------- hanging root tendrils under the island ---------- */
-    const tendrilMat = new THREE.MeshStandardMaterial({ color: '#6b4a30', roughness: 1 });
-    for (let i = 0; i < 14; i++) {
-      const a = rng.range(0, Math.PI * 2);
-      const y0 = rng.range(-3.4, -1.2);
-      const r0 = islandRadiusAt(y0) * 0.92;
-      const start = new THREE.Vector3(Math.cos(a) * r0, y0, Math.sin(a) * r0);
-      const len = rng.range(0.6, 1.8);
-      const curve = new THREE.CatmullRomCurve3([
-        start,
-        start.clone().add(new THREE.Vector3(rng.range(-0.2, 0.2), -len * 0.5, rng.range(-0.2, 0.2))),
-        start.clone().add(new THREE.Vector3(rng.range(-0.3, 0.3), -len, rng.range(-0.3, 0.3))),
-      ]);
-      const tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 8, rng.range(0.015, 0.04), 5), tendrilMat);
-      this.group.add(tube);
-    }
   }
 
   setSoilOpacity(v) {

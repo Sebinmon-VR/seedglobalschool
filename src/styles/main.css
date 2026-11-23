@@ -78,8 +78,12 @@ ul, ol { margin: 0; padding: 0; list-style: none; }
 .navbar { height: 84px; display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: 0 var(--gutter); background: rgba(251, 248, 242, 0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--line-c); transition: height 0.5s var(--ease), box-shadow 0.5s; }
 .site-header.is-scrolled { transform: translateY(-38px); }
 .site-header.is-scrolled .navbar { height: 74px; box-shadow: 0 12px 30px -26px rgba(7, 31, 27, 0.55); }
-.brand img { height: 60px; width: auto; transition: height 0.5s var(--ease); }
-.site-header.is-scrolled .brand img { height: 52px; }
+.brand { display: block; line-height: 0; }
+.seed-logo { display: block; height: 48px; width: auto; aspect-ratio: 265 / 50; overflow: visible; transition: height 0.5s var(--ease); }
+.site-header.is-scrolled .seed-logo { height: 42px; }
+.seed-logo__mark, .seed-logo__seed { fill: #0b4a45; }
+.seed-logo__sub { fill: #4e4f51; }
+.seed-logo__tag { fill: #2f3a38; font-family: var(--sans); font-size: 9.6px; font-weight: 500; }
 .nav { display: flex; gap: clamp(20px, 2.4vw, 40px); }
 .nav a { position: relative; padding: 6px 0; font-size: 15px; font-weight: 500; color: var(--green-900); text-decoration: none; }
 .nav a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--gold); transform: scaleX(0); transform-origin: right; transition: transform 0.5s var(--ease); }
@@ -571,7 +575,10 @@ a.table__row:hover strong { font-style: italic; color: var(--gold-ink); }
   .topbar { display: none; }
   .site-header.is-scrolled { transform: none; }
   .navbar, .site-header.is-scrolled .navbar { height: 68px; }
-  .brand img, .site-header.is-scrolled .brand img { height: 46px; }
+  .seed-logo, .site-header.is-scrolled .seed-logo { height: 38px; }
+}
+@media (max-width: 374px) {
+  .seed-logo, .site-header.is-scrolled .seed-logo { height: 30px; }
   .navbar .btn { display: none; }
   .rail { display: none; }
   .menu__body { padding: 90px 22px 36px; gap: 28px; }
@@ -609,8 +616,17 @@ a.table__row:hover strong { font-style: italic; color: var(--gold-ink); }
 @media (max-width: 900px) {
   .caption, .caption--wide, .caption--hero { width: 100%; }
   .chapter[data-side='right'] .caption { margin-right: 0; }
-  .chapter[data-side] .frame::before { background: linear-gradient(0deg, rgba(var(--scrim), 0.97) 0%, rgba(var(--scrim), 0.92) 55%, rgba(var(--scrim), 0) 80%); -webkit-mask-image: none; mask-image: none; }
-  .chapter--hero .frame::before { background: linear-gradient(0deg, rgba(251, 248, 242, 0.97) 0%, rgba(251, 248, 242, 0.9) 45%, rgba(251, 248, 242, 0) 75%); }
+  /* The scene shows in the open space above each caption; the text itself sits on a
+     solid, full-width panel that travels with it (soft fade at the top edge), so it
+     stays crisp and readable over the 3D scene the whole time it is on screen. */
+  .chapter[data-side] .frame::before, .chapter--hero .frame::before { display: none; }
+  .caption { isolation: isolate; }
+  .caption::before {
+    content: ''; position: absolute; z-index: -1; pointer-events: none;
+    left: -22px; right: -22px; top: -96px; bottom: -54px;
+    background: linear-gradient(180deg, rgba(var(--scrim), 0) 0, rgba(var(--scrim), 0.93) 96px, rgba(var(--scrim), 0.97) 100%);
+  }
+  .chapter--hero .caption::before { top: -72px; bottom: -44px; background: linear-gradient(180deg, rgba(var(--scrim), 0) 0, rgba(var(--scrim), 0.9) 72px, rgba(var(--scrim), 0.96) 100%); }
   .mini-stats { grid-template-columns: 1fr 1fr; }
   .mini-photos { grid-template-columns: 1fr 1fr; }
   .mini-levels { grid-template-columns: 1fr; }

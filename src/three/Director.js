@@ -59,7 +59,7 @@ export const STAGES = {
     skyTop: '#f1ccd3', skyBottom: '#fbf1ea', sunColor: '#ffe6e0', hemiSky: '#fff0f4', pollen: 0.8,
   },
   fruit: {
-    ...DAY, tx: 0, ty: 4.6, tz: 0, dist: 14.6, az: 30, el: 6, shift: -0.26,
+    ...DAY, tx: 0, ty: 4.6, tz: 0, dist: 14.6, az: 30, el: 6, shift: -0.33,
     grow: 1, roots: 1, leaves: 1, bloom: 1, fruit: 1, age: 0.9, petals: 0.35,
     skyTop: '#eea063', skyBottom: '#fbe0bf', sunColor: '#ffb469', hemiSky: '#ffe2c4', hemiGround: '#6e5232',
     sun: 2.5, hemi: 1.05, sunGlow: 1.1, pollen: 0.9,

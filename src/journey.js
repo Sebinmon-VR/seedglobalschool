@@ -14,7 +14,18 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
   const sections = [...document.querySelectorAll('[data-stage]')];
   if (!sections.length) return null;
   const small = window.matchMedia('(max-width: 900px)').matches;
-  const lowPower = small || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
+  const cores = navigator.hardwareConcurrency || 8;
+  const memory = navigator.deviceMemory || 8; // not reported by Safari
+  // Phones: sharp (MSAA, up to 2x resolution) with a slightly lighter scene; the
+  // world steps resolution down by itself if a phone can't keep up.
+  // Desktops: full scene, unless the machine looks weak.
+  const renderSettings = small
+    ? memory <= 2
+      ? { quality: 0.6, shadows: false, antialias: true, maxDpr: 1.5 }
+      : { quality: 0.85, shadows: false, antialias: true, maxDpr: 2 }
+    : cores <= 4 || memory <= 4
+      ? { quality: 0.6, shadows: false, antialias: false, maxDpr: 1.4 }
+      : { quality: 1, shadows: true, antialias: true, maxDpr: 1.75 };
   const canvas = document.getElementById('webgl');
   const director = new Director(sections);
   const journeyEl = sections[sections.length - 1];
@@ -43,7 +54,7 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
   async function createWorld() {
     try {
       const { World } = await import('./three/World.js');
-      world = new World(canvas, { quality: lowPower ? 0.6 : 1, shadows: !lowPower });
+      world = new World(canvas, renderSettings);
       world.renderer.compile(world.scene, world.camera);
       if (intro !== 'seed') {
         world.kids.skipIntro();
@@ -125,19 +136,23 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
         },
       });
     });
-    // each caption (and the wash behind it) fades as the tree moves on to the next stage
-    sections.forEach((chapter, i) => {
-      if (i === sections.length - 1) return;
-      const leave = Number(chapter.dataset.leave ?? 0.68);
-      const st = {
-        trigger: chapter,
-        start: () => (i === 0 ? 'top top' : `top+=${Math.max(0, chapter.offsetHeight - window.innerHeight) * leave} top`),
-        end: () => (i === 0 ? 'bottom 75%' : 'bottom 55%'),
-        scrub: true,
-        invalidateOnRefresh: true,
-      };
-      gsap.to(chapter.querySelectorAll('.caption, .scroll-hint'), { autoAlpha: 0, y: -50, ease: 'none', scrollTrigger: st });
-      gsap.fromTo(chapter.querySelector('.frame'), { '--scrim-o': 1 }, { '--scrim-o': 0, ease: 'none', immediateRender: false, scrollTrigger: { ...st } });
+    // Desktop only: chapters are pinned, so each caption (and the wash behind it)
+    // fades as the tree moves on to the next stage. On phones nothing is pinned and
+    // captions simply scroll past, so they stay fully visible while being read.
+    gsap.matchMedia().add('(min-width: 901px)', () => {
+      sections.forEach((chapter, i) => {
+        if (i === sections.length - 1) return;
+        const leave = Number(chapter.dataset.leave ?? 0.68);
+        const st = {
+          trigger: chapter,
+          start: () => (i === 0 ? 'top top' : `top+=${Math.max(0, chapter.offsetHeight - window.innerHeight) * leave} top`),
+          end: () => (i === 0 ? 'bottom 75%' : 'bottom 55%'),
+          scrub: true,
+          invalidateOnRefresh: true,
+        };
+        gsap.to(chapter.querySelectorAll('.caption, .scroll-hint'), { autoAlpha: 0, y: -50, ease: 'none', scrollTrigger: st });
+        gsap.fromTo(chapter.querySelector('.frame'), { '--scrim-o': 1 }, { '--scrim-o': 0, ease: 'none', immediateRender: false, scrollTrigger: { ...st } });
+      });
     });
   }
 
@@ -194,10 +209,16 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
   }
 
   let resizeTimer;
+  let lastWidth = window.innerWidth;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
       world?.resize();
+      // a phone's address bar showing/hiding changes only the height: don't
+      // re-layout every scroll trigger for that (it makes the page jump)
+      const widthChanged = window.innerWidth !== lastWidth;
+      lastWidth = window.innerWidth;
+      if (!widthChanged && window.innerWidth < 900) return;
       ScrollTrigger.refresh();
       director.measure();
       measureEnd();
@@ -207,7 +228,11 @@ export function initJourney({ lenis, reduced, intro = 'fade' }) {
     director.measure();
     measureEnd();
   });
-  window.addEventListener('pointermove', (e) => world?.setPointer((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1), { passive: true });
+  // the camera follows the mouse; ignore touch, or the scene wobbles while scrolling
+  window.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    world?.setPointer((e.clientX / innerWidth) * 2 - 1, (e.clientY / innerHeight) * 2 - 1);
+  }, { passive: true });
 
   const ready = boot();
   return { director, goToStage, ready };

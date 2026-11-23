@@ -9,17 +9,26 @@ import { clamp } from './utils.js';
 const DEG = Math.PI / 180;
 
 export class World {
-  constructor(canvas, { quality = 1, shadows = true } = {}) {
+  /**
+   * quality   => scene density (leaves, grass, particles)
+   * antialias => MSAA (cheap on phone GPUs, so phones keep it on)
+   * maxDpr    => sharpest pixel ratio to start at; if frames run slow the
+   *              resolution steps down automatically (see adaptResolution)
+   */
+  constructor(canvas, { quality = 1, shadows = true, antialias = quality >= 1, maxDpr = quality >= 1 ? 1.75 : 1.4 } = {}) {
     this.quality = quality;
     this.canvas = canvas;
     this.renderer = new THREE.WebGLRenderer({
       canvas,
-      antialias: quality >= 1,
+      antialias,
       alpha: false,
       powerPreference: 'high-performance',
     });
-    this.maxDpr = quality >= 1 ? 1.75 : 1.4;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.maxDpr));
+    this.dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    this.minDpr = Math.min(this.dpr, 1);
+    this.adaptive = true;
+    this.perf = { frames: 0, sum: 0, n: 0, last: 0 };
+    this.renderer.setPixelRatio(this.dpr);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.shadowMap.enabled = shadows;
@@ -80,16 +89,44 @@ export class World {
   }
 
   resize() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    // size to the canvas box itself (CSS: 100vw x 100lvh) so the picture is never
+    // stretched when a phone's address bar shows or hides
+    const w = this.canvas.clientWidth || window.innerWidth;
+    const h = this.canvas.clientHeight || window.innerHeight;
     this.size = { w, h };
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.maxDpr));
+    this.renderer.setPixelRatio(this.dpr);
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.fov = w / h < 0.85 ? 50 : 40;
     this.camera.updateProjectionMatrix();
-    this.narrow = w < 900;
+    this.narrow = window.innerWidth < 900;
     this.pointScale = this.renderer.getPixelRatio() * h * 0.012;
+  }
+
+  setDpr(dpr) {
+    this.dpr = dpr;
+    this.resize();
+  }
+
+  /**
+   * Keep scrolling smooth on slower devices: if frames average under ~45 fps,
+   * drop the resolution a step (never below minDpr). Long gaps (tab hidden,
+   * scene off screen) and the first couple of seconds are ignored.
+   */
+  adaptResolution(time) {
+    const p = this.perf;
+    const dt = time - p.last;
+    p.last = time;
+    if (!this.adaptive || ++p.frames < 120 || dt <= 0 || dt > 0.25) return;
+    p.sum += dt;
+    if (++p.n < 90) return;
+    const avg = p.sum / p.n;
+    p.sum = 0;
+    p.n = 0;
+    if (avg > 1 / 45 && this.dpr > this.minDpr) {
+      this.setDpr(Math.max(this.minDpr, Math.round((this.dpr - 0.25) * 100) / 100));
+      p.frames = 60; // let the new size settle before measuring again
+    }
   }
 
   setPointer(x, y) {
@@ -176,5 +213,6 @@ export class World {
     this.petals.uniforms.uTime.value = time;
     this.sky.mesh.position.copy(this.camera.position);
     this.renderer.render(this.scene, this.camera);
+    this.adaptResolution(time);
   }
 }
