@@ -2,19 +2,22 @@ import * as THREE from 'three';
 import { clamp, lerp, easeInOut, smoothstep } from './utils.js';
 
 /**
- * Each chapter of the page owns a "stage" in the life of the tree (and the
- * children who planted it). The director interpolates between these
- * keyframes as the visitor scrolls.
+ * Each chapter of the page owns a "stage" in the life of the tree, and each
+ * tree stage stands for a stage in a child's growth at SEED:
+ *   hero (seed: a child arrives) → roots (belonging) → trunk (sapling: Pre-Primary)
+ *   → branches (Primary) → leaves (Upper Primary) → canopy (character)
+ *   → bloom (talents) → fruit (confidence) → harvest (new seeds: ready for the world)
+ * The director interpolates between these keyframes as the visitor scrolls.
  *   shift > 0 => tree sits on the right of the screen (text on the left)
- *   age       => 0 little pre-primary children … 1 teenage graduates
+ *   age       => 0 little Pre-Primary children … 1 Upper Primary
  *   water     => how hard the watering can is pouring
- *   grad      => graduation gowns + caps (and the cap toss at 1)
+ *   gather    => children step forward together under the grown tree and wave
  */
 const DAY = {
   skyTop: '#cfe1d8', skyBottom: '#f6efe3', sunColor: '#fff0cf',
   hemiSky: '#e4f4ff', hemiGround: '#7a6646',
   sun: 2.6, hemi: 1.25, sunGlow: 0.75, stars: 0, fireflies: 0, pollen: 0.6, wind: 0.7, petals: 0, soil: 1,
-  water: 0, grad: 0, fill: 0.65,
+  water: 0, gather: 0, fill: 0.65,
 };
 
 export const STAGES = {
@@ -35,7 +38,7 @@ export const STAGES = {
     skyTop: '#cde0d6', skyBottom: '#f4eee3',
   },
   branches: {
-    ...DAY, tx: 0, ty: 4.0, tz: 0, dist: 13.8, az: -32, el: 13, shift: -0.26,
+    ...DAY, tx: 0, ty: 4.0, tz: 0, dist: 13.8, az: -32, el: 13, shift: -0.31,
     grow: 0.8, roots: 1, leaves: 1, bloom: 0, fruit: 0, age: 0.34,
     skyTop: '#bcd5da', skyBottom: '#f0f0e7',
   },
@@ -63,7 +66,7 @@ export const STAGES = {
   },
   harvest: {
     ...DAY, tx: 0, ty: 3.3, tz: 0.8, dist: 15.5, az: 6, el: 7, shift: 0.25,
-    grow: 1, roots: 1, leaves: 1, bloom: 1, fruit: 1, age: 1, grad: 1, petals: 0.12,
+    grow: 1, roots: 1, leaves: 1, bloom: 1, fruit: 1, age: 1, gather: 1, petals: 0.12,
     skyTop: '#0f1730', skyBottom: '#a65a4e', sunColor: '#ffb48a', hemiSky: '#8da7d6', hemiGround: '#2a1d18',
     sun: 2.0, hemi: 0.95, sunGlow: 1.0, stars: 0.8, fireflies: 0.9, pollen: 0.2, wind: 0.5, fill: 1.5,
   },
@@ -77,12 +80,9 @@ Object.assign(STAGES, {
     grow: 0.7, roots: 1, leaves: 1, bloom: 0, fruit: 0, age: 0.4, soil: 0.3,
     skyTop: '#d4e6dd', skyBottom: '#f6efe3', fill: 0.8,
   },
-  // Academics: a young tree in clear morning light, seen from below the canopy
-  academicsHero: {
-    ...DAY, tx: 0, ty: 4.2, tz: 0, dist: 15.5, az: 60, el: 15, shift: 0.24,
-    grow: 0.9, roots: 1, leaves: 1, bloom: 0, fruit: 0, age: 0.4,
-    skyTop: '#bad7e0', skyBottom: '#f3f2e8',
-  },
+  // Academics: starts as a sprout, then grows through Pre-Primary (trunk),
+  // Primary (branches) and Upper Primary (leaves) as the visitor scrolls
+  academicsHero: { ...STAGES.hero, skyTop: '#bad7e0', skyBottom: '#f3f2e8' },
   // Admissions: golden fruit at golden hour
   admissionsHero: {
     ...DAY, tx: 0, ty: 4.8, tz: 0, dist: 14.5, az: -26, el: 8, shift: 0.24,

@@ -4,12 +4,13 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { groundHeight } from './Island.js';
-import { clamp, lerp, smoothstep, createRng } from './utils.js';
+import { clamp, lerp, smoothstep } from './utils.js';
 
 /*
- * The children who plant the seed, water it, grow up with the tree and
- * graduate at the end. They use professionally modelled, rigged and animated
- * glTF characters listed in /assets/models/kids/kids.json (see README).
+ * The children who plant the seed, water it and grow up with the tree. At the
+ * end they step forward together under the full-grown tree and wave.
+ * They use professionally modelled, rigged and animated glTF characters
+ * listed in /assets/models/kids/kids.json (see README).
  * If no models are present the scene simply runs without children.
  */
 
@@ -26,12 +27,12 @@ const lerpAngle = (a, b, t) => {
   return a + d * t;
 };
 
-/* where each child stands and what they do */
+/* where each child stands around the tree, and where they gather at the end */
 const SLOTS = [
-  { role: 'planter', angle: 52, gradAngle: -33 },
-  { role: 'waterer', angle: -58, gradAngle: -11 },
-  { role: 'clap', angle: 128, gradAngle: 11 },
-  { role: 'wave', angle: -128, gradAngle: 33 },
+  { role: 'planter', angle: 52, frontAngle: -33 },
+  { role: 'waterer', angle: -58, frontAngle: -11 },
+  { role: 'clap', angle: 128, frontAngle: 11 },
+  { role: 'wave', angle: -128, frontAngle: 33 },
 ];
 
 /* animation clips: names from kids.json, else matched by these patterns */
@@ -43,14 +44,11 @@ const CLIP_PATTERNS = {
   kneel: /kneel|plant|crouch|pick|gather|sit/i,
 };
 const BONE_PATTERNS = {
-  head: /(^|[:_ .])head$/i,
   handR: /(right.?hand|hand[._ ]?r|r[._ ]hand|palm\d?[._]r)$/i,
-  chest: /(spine2|upper.?chest|chest|torso|spine1)$/i,
 };
 
-/* ---------- props (graduation cap, stole, diploma, watering can) ---------- */
+/* ---------- props (watering can) ---------- */
 const PROP_MAT = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55 });
-const PROP_MAT_DS = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75, side: THREE.DoubleSide });
 function part(geo, color, { pos = [0, 0, 0], rot = [0, 0, 0], scale = 1 } = {}) {
   const g = geo.clone();
   for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
@@ -62,24 +60,8 @@ function part(geo, color, { pos = [0, 0, 0], rot = [0, 0, 0], scale = 1 } = {}) 
   g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
   return g;
 }
-const SPH = new THREE.SphereGeometry(1, 14, 10);
 // all props are built for a 1-unit-tall child and scaled with the child
 const PROPS = {
-  cap: () => mergeGeometries([
-    part(new THREE.CylinderGeometry(0.075, 0.08, 0.035, 20), '#0b3a36'),
-    part(new THREE.BoxGeometry(0.2, 0.01, 0.2), '#0b3a36', { pos: [0, 0.02, 0] }),
-    part(SPH, '#f2a93b', { pos: [0, 0.027, 0], scale: 0.009 }),
-    part(new THREE.CylinderGeometry(0.0035, 0.0035, 0.07, 6), '#f2a93b', { pos: [0.09, -0.012, 0.02] }),
-    part(SPH, '#f2a93b', { pos: [0.09, -0.05, 0.02], scale: [0.009, 0.015, 0.009] }),
-  ]),
-  stole: () => mergeGeometries([1, -1].map((s) => part(new THREE.BoxGeometry(0.045, 0.24, 0.008), '#f2a93b', { pos: [s * 0.045, -0.11, 0], rot: [0, 0, s * 0.06] }))),
-  gown: () => mergeGeometries([
-    part(new THREE.LatheGeometry([[0.04, 0.02], [0.12, 0.0], [0.15, -0.12], [0.17, -0.34], [0.2, -0.5]].map(([r, y]) => new THREE.Vector2(r, y)), 28), '#14625a'),
-  ]),
-  diploma: () => mergeGeometries([
-    part(new THREE.CylinderGeometry(0.014, 0.014, 0.15, 12), '#fbf6ea', { rot: [0, 0, Math.PI / 2] }),
-    part(new THREE.CylinderGeometry(0.0155, 0.0155, 0.025, 12), '#c23b33', { rot: [0, 0, Math.PI / 2] }),
-  ]),
   can: () => mergeGeometries([
     part(new THREE.CylinderGeometry(0.045, 0.05, 0.075, 18), '#2f9e6e', { pos: [0, -0.01, 0] }),
     part(new THREE.CylinderGeometry(0.046, 0.046, 0.012, 18), '#f2a93b', { pos: [0, 0.025, 0] }),
@@ -162,70 +144,6 @@ class ModelKid {
 }
 
 /* ------------------------------------------------------------------ */
-class Confetti {
-  constructor(count = 320) {
-    const rng = createRng(2026);
-    const geo = new THREE.InstancedBufferGeometry().copy(new THREE.PlaneGeometry(0.07, 0.11));
-    geo.instanceCount = count;
-    const start = new Float32Array(count * 3);
-    const vel = new Float32Array(count * 4);
-    const col = new Float32Array(count * 3);
-    const palette = ['#f2a93b', '#ffd36b', '#0f8a7a', '#ffffff', '#f29bb5', '#7fc06b'].map((c) => new THREE.Color(c));
-    for (let i = 0; i < count; i++) {
-      const a = rng.range(0, Math.PI * 2);
-      const r = rng.range(0, 2.4);
-      start.set([Math.cos(a) * r, rng.range(1.2, 1.9), Math.sin(a) * r + 1.4], i * 3);
-      vel.set([rng.range(-1.4, 1.4), rng.range(3.2, 5.6), rng.range(-1.2, 1.4), rng.next()], i * 4);
-      const c = rng.pick(palette);
-      col.set([c.r, c.g, c.b], i * 3);
-    }
-    geo.setAttribute('aStart', new THREE.InstancedBufferAttribute(start, 3));
-    geo.setAttribute('aVel', new THREE.InstancedBufferAttribute(vel, 4));
-    geo.setAttribute('aColor', new THREE.InstancedBufferAttribute(col, 3));
-    this.uniforms = { uT: { value: 99 } };
-    this.mesh = new THREE.Mesh(
-      geo,
-      new THREE.ShaderMaterial({
-        uniforms: this.uniforms,
-        transparent: true,
-        depthWrite: false,
-        side: THREE.DoubleSide,
-        vertexShader: /* glsl */ `
-          attribute vec3 aStart; attribute vec4 aVel; attribute vec3 aColor;
-          uniform float uT;
-          varying vec3 vC; varying float vA;
-          void main(){
-            float t = uT;
-            float g = 3.2;
-            float tp = aVel.y / g;
-            float y = t < tp ? aVel.y * t - 0.5 * g * t * t : aVel.y * tp * 0.5 - 0.55 * (t - tp);
-            vec3 c = aStart + vec3(aVel.x * min(t, 2.0) * 0.6, y, aVel.z * min(t, 2.0) * 0.6);
-            c.x += sin(t * 3.0 + aVel.w * 20.0) * 0.25 * smoothstep(0.0, 1.0, t);
-            c.y = max(c.y, 0.06);
-            float ang = t * (4.0 + aVel.w * 6.0) + aVel.w * 30.0;
-            mat3 r = mat3(cos(ang), sin(ang), 0.0, -sin(ang), cos(ang), 0.0, 0.0, 0.0, 1.0)
-                   * mat3(1.0, 0.0, 0.0, 0.0, cos(ang * 0.7), sin(ang * 0.7), 0.0, -sin(ang * 0.7), cos(ang * 0.7));
-            vC = aColor * (0.7 + 0.3 * abs(cos(ang)));
-            vA = smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(5.5, 7.0, t));
-            vec4 mv = modelViewMatrix * vec4(c + r * position, 1.0);
-            gl_Position = projectionMatrix * mv;
-          }`,
-        fragmentShader: /* glsl */ `
-          varying vec3 vC; varying float vA;
-          void main(){
-            if (vA < 0.01) discard;
-            gl_FragColor = vec4(vC, vA);
-            #include <colorspace_fragment>
-          }`,
-      }),
-    );
-    this.mesh.frustumCulled = false;
-    this.burstAt = -99;
-  }
-  burst(now) { this.burstAt = now; }
-  update(now) { this.uniforms.uT.value = now - this.burstAt; }
-}
-
 class Droplets {
   constructor(count = 90) {
     this.count = count;
@@ -273,18 +191,13 @@ export class Kids {
     this.group = new THREE.Group();
     this.kids = [];
     this.props = [];
-    this.confetti = new Confetti();
     this.droplets = new Droplets();
-    this.group.add(this.confetti.mesh, this.droplets.points);
+    this.group.add(this.droplets.points);
     this.dropping = false;
     this.impactAt = -99;
-    this.tossAt = -99;
     this.appear = 0;
     this._v = new THREE.Vector3();
-    this._q = new THREE.Quaternion();
-    this._q2 = new THREE.Quaternion();
     this._dir = new THREE.Vector3();
-    this._up = new THREE.Vector3(0, 1, 0);
     this.ready = this.load();
   }
 
@@ -307,16 +220,11 @@ export class Kids {
       const gltf = gltfs[mi];
       if (!gltf) return;
       const kid = new ModelKid(gltf, slot, { ...cfg, ...files[mi], clips: { ...cfg.clips, ...files[mi].clips }, bones: { ...cfg.bones, ...files[mi].bones } }, this.shadows);
-      // graduation + watering props, sized for a 1-unit child and scaled with it
-      kid.cap = this.prop(PROPS.cap(), PROP_MAT);
-      kid.stole = this.prop(PROPS.stole(), PROP_MAT);
-      kid.diploma = this.prop(PROPS.diploma(), PROP_MAT);
-      kid.gown = cfg.gown === false ? null : this.prop(PROPS.gown(), PROP_MAT_DS);
+      // watering can, sized for a 1-unit child and scaled with it
       if (slot.role === 'waterer') {
         kid.can = this.prop(PROPS.can(), PROP_MAT);
         kid.spout = new THREE.Vector3(0, 0.05, 0.13);
       }
-      kid.capOffset = cfg.capOffset ?? 0.11;
       this.kids.push(kid);
       this.group.add(kid.root);
     });
@@ -344,113 +252,56 @@ export class Kids {
     this.impactAt = gsap.ticker.time - 10;
   }
 
-  /** Place a prop at a bone, offset in the bone's frame (scaled to the child). */
-  attach(mesh, bone, kidScale, offset, { upright = false, extraQ = null } = {}) {
-    if (!bone) return false;
-    bone.getWorldPosition(this._v);
-    if (upright) {
-      this._q.copy(mesh.parent ? this._q2.identity() : this._q2.identity());
-    } else {
-      bone.getWorldQuaternion(this._q);
-    }
-    const off = this._dir.copy(offset).multiplyScalar(kidScale);
-    if (!upright) off.applyQuaternion(this._q);
-    mesh.position.copy(this._v).add(off);
-    mesh.quaternion.copy(this._q);
-    if (extraQ) mesh.quaternion.multiply(extraQ);
-    mesh.scale.setScalar(kidScale);
-    return true;
-  }
-
   update(t, dt, s) {
-    this.confetti.update(t);
-    const grad = clamp(s.grad);
-    if (grad > 0.97 && t - this.tossAt > 9) {
-      this.tossAt = t;
-      this.confetti.burst(t + 0.45);
-    }
-    if (grad < 0.6) this.tossAt = -99;
     if (!this.kids.length) {
       this.droplets.update(dt, null, 0, this._dir);
       return;
     }
     const sinceImpact = t - this.impactAt;
     const grow = s.grow;
-    const tossU = clamp((t - this.tossAt) / 2.1);
-    const tossH = this.tossAt > 0 && tossU < 1 ? 2.3 * 4 * tossU * (1 - tossU) : 0;
-    const tossCheer = this.tossAt > 0 ? smoothstep(0, 0.15, t - this.tossAt) * (1 - smoothstep(2.3, 3.0, t - this.tossAt)) : 0;
+    const gather = clamp(s.gather);
     const introCheer = smoothstep(0, 0.12, sinceImpact) * (1 - smoothstep(1.6, 2.2, sinceImpact));
     const sprouting = smoothstep(0.004, 0.02, grow) * (1 - smoothstep(0.1, 0.16, grow));
     const age = clamp(s.age);
     const height = lerp(1.05, 1.7, age);
     const spread = lerp(1.4, 2.6, age);
     const pop = easeOutBack(clamp(this.appear));
-    const g = smoothstep(0, 1, grad);
+    const g = smoothstep(0, 1, gather);
     let pouring = false;
 
     for (const kid of this.kids) {
-      const { role, angle, gradAngle } = kid.slot;
+      const { role, angle, frontAngle } = kid.slot;
       const w = { cheer: 0, wave: 0, clap: 0, kneel: 0 };
       let rad = spread;
       if (role === 'planter') {
         w.kneel = smoothstep(1.6, 2.4, sinceImpact) * (1 - smoothstep(0.03, 0.12, grow));
         rad = lerp(rad, 0.75, w.kneel);
       }
-      const hold = role === 'waterer' ? (1 - smoothstep(0.25, 0.4, age)) * (1 - grad) : 0;
+      const hold = role === 'waterer' ? (1 - smoothstep(0.25, 0.4, age)) * (1 - gather) : 0;
       const pour = role === 'waterer' ? clamp(s.water) * hold : 0;
       if (role === 'waterer') rad = lerp(rad, 1.15, pour);
       if (role === 'clap' || role === 'wave') w.clap = sprouting;
-      if (role === 'wave') w.wave = Math.pow(Math.max(0, Math.sin(t * 0.45 + 1)), 8) * (1 - grad) * (1 - w.clap);
-      w.cheer = Math.max(introCheer, tossCheer, this.dropping ? 0 : 0);
+      if (role === 'wave') w.wave = Math.pow(Math.max(0, Math.sin(t * 0.45 + 1)), 8) * (1 - g) * (1 - w.clap);
+      // gathered at the end: every child waves now and then, a little out of step
+      w.wave = Math.max(w.wave, g * Math.pow(Math.max(0, Math.sin(t * 0.5 + kid.phase)), 6));
+      w.cheer = introCheer;
       if (w.cheer > 0) w.kneel *= 1 - w.cheer;
 
       let x = Math.sin(angle * DEG) * rad;
       let z = Math.cos(angle * DEG) * rad;
-      x = lerp(x, Math.sin(gradAngle * DEG) * 3.0, g);
-      z = lerp(z, Math.cos(gradAngle * DEG) * 3.0, g);
+      x = lerp(x, Math.sin(frontAngle * DEG) * 3.0, g);
+      z = lerp(z, Math.cos(frontAngle * DEG) * 3.0, g);
       kid.root.position.set(x, groundHeight(x, z) - 0.01, z);
       const faceTree = Math.atan2(-x, -z);
       let face = lerpAngle(faceTree, 0, 0.5);
       if (w.kneel > 0 || pour > 0) face = lerpAngle(face, faceTree, Math.max(w.kneel, pour));
-      face = lerpAngle(face, 0, grad);
+      face = lerpAngle(face, 0, gather);
       kid.root.rotation.y = face;
       const sc = height * Math.max(0.0001, pop);
       kid.root.scale.setScalar(sc);
 
       kid.update(dt, w);
       kid.root.updateMatrixWorld(true);
-
-      // graduation props follow the skeleton
-      const gs = easeOutBack(clamp(grad));
-      const showGrad = gs > 0.01;
-      kid.cap.visible = showGrad && !!kid.bones.head;
-      if (kid.cap.visible) {
-        kid.bones.head.getWorldPosition(this._v);
-        kid.cap.position.copy(this._v);
-        kid.cap.position.y += kid.capOffset * sc + tossH;
-        kid.cap.quaternion.setFromAxisAngle(this._up, face + (tossH > 0 ? tossU * Math.PI * 4 : 0));
-        kid.cap.scale.setScalar(sc * gs);
-      }
-      kid.stole.visible = showGrad && !!kid.bones.chest;
-      if (kid.stole.visible) {
-        kid.bones.chest.getWorldPosition(this._v);
-        kid.stole.position.copy(this._v).add(this._dir.set(Math.sin(face), 0, Math.cos(face)).multiplyScalar(0.09 * sc));
-        kid.stole.position.y += 0.1 * sc;
-        kid.stole.quaternion.setFromAxisAngle(this._up, face);
-        kid.stole.scale.setScalar(sc * gs);
-      }
-      if (kid.gown) {
-        kid.gown.visible = showGrad && !!kid.bones.chest;
-        if (kid.gown.visible) {
-          kid.bones.chest.getWorldPosition(this._v);
-          kid.gown.position.copy(this._v);
-          kid.gown.position.y += 0.08 * sc;
-          kid.gown.quaternion.setFromAxisAngle(this._up, face);
-          kid.gown.scale.setScalar(sc * gs);
-        }
-      }
-      kid.diploma.visible = showGrad && !!kid.bones.handR;
-      if (kid.diploma.visible) this.attach(kid.diploma, kid.bones.handR, sc * gs, this._v.set(0, 0, 0));
 
       if (kid.can) {
         kid.can.visible = hold > 0.02 && !!kid.bones.handR;

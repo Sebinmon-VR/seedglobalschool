@@ -2,19 +2,21 @@
 
 An immersive 3D scrolling website for SEED Global School (Maranchery, Ponnani, Kerala).
 
-When the page loads, a seed drops onto a floating island of earth. As the visitor scrolls, it grows into a tree, and the page moves through nine "chapters". Each chapter holds while its text appears, then the tree grows on into the next stage:
+When the page loads, a seed drops onto a floating island of earth. As the visitor scrolls, it grows into a tree, and the page moves through nine "chapters". Each stage of the tree stands for a stage in a child's growth at SEED. Each chapter holds while its text appears, then the tree grows on into the next stage:
 
-| Stage | Chapter | Scene |
-|---|---|---|
-| Seed | Hero | The seed falls, bounces and lands with a golden dust burst |
-| Roots | About | The camera dives below ground and roots glow through the soil |
-| Trunk | Values | The seed cracks open and the trunk rises |
-| Branches | Academics | Branches spread out |
-| Leaves | Curriculum | Thousands of leaves open |
-| Canopy | Leadership | The full canopy at dusk |
-| Blossom | Life at SEED | Blossoms and falling petals. A "magazine sheet" slides over the scene with **Events**, **Gallery** and **Videos** |
-| Fruit | Admissions | Golden fruit at golden hour |
-| Graduation | Contact | Graduates throw their caps under a dusk sky, with confetti and fireflies |
+| Tree stage | The child | Chapter content | Scene |
+|---|---|---|---|
+| Seed | Arrives | Hero: "Foster blooming minds" | The seed falls, bounces and lands with a golden dust burst |
+| Roots | Belonging | Feeling safe and known; school facts | The camera dives below ground and roots glow through the soil |
+| Sapling | Pre-Primary (age 4–6): first independence | Montessori areas | The seed cracks open and the trunk rises |
+| Branches | Primary (Grade 1–3): curiosity reaching out | Primary subjects | Branches spread out |
+| Leaves | Upper Primary (Grade 4–7): knowledge | Labs, library, SEED Talks | Thousands of leaves open |
+| Canopy | Character | The eight values | The full canopy at dusk |
+| Blossom | Talents | Events and gallery photos | Blossoms and falling petals |
+| Fruit | Confidence | Prizes and Achievers' Day | Golden fruit at golden hour |
+| New seeds | Ready for the world; a new child begins | Admissions and campus visit | The grown tree at dusk, with fireflies |
+
+The `data-stage` keys behind these (in `src/three/Director.js`) are `hero`, `roots`, `trunk`, `branches`, `leaves`, `canopy`, `bloom`, `fruit` and `harvest`. The Academics page reuses `trunk`, `branches` and `leaves` for Pre-Primary, Primary and Upper Primary.
 
 ## Run it
 
@@ -54,21 +56,21 @@ The header, full-screen menu and footer are shared. They live in `partials/heade
 | CBSE documents | `public/docs/` + `disclosure.html` |
 | Styles | `src/styles/main.css` (deep green, ivory and gold; Playfair Display + Inter) |
 
-## Children characters (planting → growing up → graduation)
+## Children characters (planting → growing up)
 
 The scene supports rigged, animated **glTF/GLB** characters. When they're present, the children:
 
 - look up as the seed falls and cheer when it lands
 - kneel to plant it, and water it with a watering can
 - grow taller chapter by chapter
-- step forward at the end in gowns with a gold stole and diploma, and throw their caps in the air
+- step forward together under the full-grown tree at the end and wave
 
 To add them:
 
 1. Put the `.glb` files in `public/assets/models/kids/`.
 2. Copy `kids.example.json` to `kids.json` and list the files.
    - `clips` maps our actions (`idle`, `wave`, `cheer`, `clap`, `kneel`) to the animation names in the files.
-   - `bones` names the head, right hand and chest bones, where the cap, diploma and stole attach.
+   - `bones` names the right-hand bone, where the watering can attaches.
    - `slots` picks which model stands in each of the 4 places: planter, waterer, clapper and waver.
 3. Reload the page. If `kids.json` is missing, the site runs without children.
 
@@ -88,8 +90,8 @@ Add `?debug` to the URL to get `__world`, `__director` and `__lenis` in the brow
 
 ## Content to confirm with the school
 
-- **Principal's message:** only the opening line is used (see `TODO` in `index.html`).
-- **Key personnel photos:** check that each photo matches the right name (see `NOTE` in `index.html`).
+- **Principal's message:** only the opening line is used (see `TODO` in `about.html`).
+- **Key personnel photos:** check that each photo matches the right name (see `NOTE` in `about.html`).
 - **Admission steps:** the four steps are a suggested journey.
 - **Calendar:** events are taken from the 2025–26 academic calendar. Update `src/data/events.js` when the 2026–27 calendar is out.
 - **Enquiry form:** it opens WhatsApp with a pre-filled message. It can be connected to email or a CRM.

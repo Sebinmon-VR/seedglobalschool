@@ -6,7 +6,5 @@
   ],
   "slots": [0, 2, 1, 0],
   "clips": { "idle": "Idle", "wave": "Wave", "cheer": "Jump", "clap": "Clap", "kneel": "Kneel" },
-  "bones": { "head": "Head", "handR": "RightHand", "chest": "Spine2" },
-  "capOffset": 0.11,
-  "gown": true
+  "bones": { "handR": "RightHand" }
 }

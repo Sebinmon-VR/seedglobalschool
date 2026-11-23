@@ -72,7 +72,7 @@ export const EVENTS = {
     { day: '08', title: 'Women’s Day', note: 'Celebrating the women who inspire us', tag: 'community' },
     { day: '24', title: 'Annual Examinations', note: 'The year’s final assessments', tag: 'learning' },
   ],
-  Apr: [{ day: '03', title: 'Annual Parents’ Meeting & Convocation', note: 'Grade 3 convocation: our little graduates', tag: 'milestone' }],
+  Apr: [{ day: '03', title: 'Annual Parents’ Meeting', note: 'Looking back on a year of growth, together', tag: 'community' }],
 };
 
 export const MONTHS = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
