@@ -69,7 +69,8 @@ Day-to-day content is managed in the SEED Web Admin control panel ([github.com/S
 | **Posts** | News page cards, and `post.html?slug=…` for each article |
 | **Notices** | News page notice board (pinned and urgent first, attachments). Notices marked *Show in ticker* scroll in the top bar on every page (wide screens) |
 | **Events & live** | News page "Coming up" chapter and events list. While an event is live (**Go live**, or between its start and end), a *Live now* badge shows near the top of every page and the stream plays on the News page |
-| **Photo gallery**, **Videos** | News page photos (with album filters) and videos (YouTube, Vimeo, Facebook or uploaded files) |
+| **Photo gallery** | Gallery page "Latest photos" (above the built-in photos) and the News page, both with album filters |
+| **Videos** | News page videos (YouTube, Vimeo, Facebook or uploaded files) |
 | **Website images** | Every picture built into the site. A replaced picture shows on every page that uses it; *Reset* brings back the original |
 | **Enquiries** | The Admissions and Contact forms post here (source "Website · Admissions" / "Website · Contact") |
 

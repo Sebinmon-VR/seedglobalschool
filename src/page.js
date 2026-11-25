@@ -45,6 +45,9 @@ if (document.body.classList.contains('page--news')) {
 if (document.body.classList.contains('page--post')) {
   import('./cms/post.js').then(({ initPost }) => initPost());
 }
+if (document.getElementById('latest-photos')) {
+  import('./cms/gallery.js').then(({ initGallery }) => initGallery({ reduced }));
+}
 
 // same-page anchors scroll smoothly
 document.querySelectorAll('a[href*="#"]').forEach((a) => {

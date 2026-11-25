@@ -52,6 +52,15 @@
 
     <section class="section" id="photos">
       <div class="container">
+        <!-- photos posted in the admin panel's Photo gallery (src/cms/gallery.js); hidden until there is one -->
+        <div class="latest-photos" id="latest-photos" hidden data-cms>
+          <header class="section-head">
+            <div><p class="kicker">Latest photos</p><h2 class="section-title">Fresh from <em>the camera</em></h2></div>
+            <div class="filters" id="album-filters" role="group" aria-label="Albums" hidden data-cms></div>
+          </header>
+          <div class="grid" id="photo-list"></div>
+          <div class="center"><button class="btn btn--outline" type="button" id="photo-more" hidden data-cms>More photos</button></div>
+        </div>
         <header class="section-head">
           <div><p class="kicker">Photo gallery</p><h2 class="section-title" data-split>Life at <em>SEED</em></h2></div>
           <div class="filters" role="group" aria-label="Filter photos" data-reveal>

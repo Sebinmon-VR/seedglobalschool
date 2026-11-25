@@ -833,3 +833,6 @@ a.table__row:hover strong { font-style: italic; color: var(--gold-ink); }
   .article { font-size: 17px; }
   .post__cover { padding: 0; }
 }
+
+/* gallery page: "Latest photos" from the panel, above the built-in photos */
+.latest-photos { margin-bottom: clamp(64px, 7vw, 110px); padding-bottom: clamp(56px, 6vw, 96px); border-bottom: 1px solid var(--line-c); }

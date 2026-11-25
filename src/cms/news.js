@@ -1,8 +1,9 @@
-import gsap from 'gsap';
 import { cms, cmsEnabled } from './api.js';
 import { esc, fmtDate, dayMonth, fmtWhen, fmtTime, isoDate, paragraphs, playerUrl, safeUrl } from './format.js';
 import { EVENTS, MONTHS, MONTH_NAMES } from '../data/events.js';
 import { postCard } from './cards.js';
+import { pager as listPager, relayout } from './list.js';
+import { loadPhotoFeed } from './photos.js';
 
 /**
  * News & notices page (news.html): everything managed in the SEED Web Admin panel.
@@ -12,57 +13,9 @@ import { postCard } from './cards.js';
 const PER_PAGE = { notices: 8, posts: 6, events: 8, photos: 9, videos: 6 };
 const MONTH_INDEX = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
 const $ = (id) => document.getElementById(id);
-const toNodes = (html) => {
-  const t = document.createElement('template');
-  t.innerHTML = html;
-  return [...t.content.children];
-};
 
 export function initNews({ reduced, openFrame, openFile, scrollToEl }) {
-  const relayout = () => window.dispatchEvent(new Event('seed:layout'));
-  const appear = (nodes) => {
-    if (!reduced && nodes.length) gsap.fromTo(nodes, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'expo.out', stagger: 0.06 });
-  };
-
-  /** "Load more" pagination for one list. */
-  function pager({ list, more, fetchPage, render }) {
-    let page = 0;
-    let busy = false;
-    let generation = 0; // bumped by reset(), so a reply for an old filter is dropped
-    const next = async () => {
-      if (busy) return null;
-      busy = true;
-      more.disabled = true;
-      const mine = generation;
-      try {
-        const data = await fetchPage(page + 1);
-        if (mine !== generation) return null;
-        const nodes = toNodes(data.items.map(render).join(''));
-        list.append(...nodes);
-        page = data.page;
-        more.hidden = page >= data.pages;
-        if (page > 1) appear(nodes);
-        relayout();
-        return data;
-      } finally {
-        if (mine === generation) {
-          busy = false;
-          more.disabled = false;
-        }
-      }
-    };
-    more.addEventListener('click', () => next().catch((err) => console.info('[SEED] Could not load more:', err.message)));
-    return {
-      next,
-      reset() {
-        generation += 1;
-        page = 0;
-        busy = false;
-        more.disabled = false;
-        list.replaceChildren();
-      },
-    };
-  }
+  const pager = (opts) => listPager({ ...opts, reduced });
 
   /* ---------- the "Coming up" chapter: the academic calendar until the panel has events ---------- */
   function renderComingUp(items) {
@@ -192,49 +145,9 @@ export function initNews({ reduced, openFrame, openFile, scrollToEl }) {
     </li>`;
   }
 
-  /* ---------- photos, with album filters ---------- */
-  async function loadPhotos() {
-    let album = '';
-    const p = pager({
-      list: $('photo-list'),
-      more: $('photo-more'),
-      fetchPage: (page) => cms.gallery({ page, limit: PER_PAGE.photos, album }),
-      render: photoTile,
-    });
-    const [first, albums] = await Promise.all([p.next(), cms.albums().catch(() => ({ items: [] }))]);
-    if (!first?.total) return false;
-    const names = (albums.items || []).map((a) => a.album).filter(Boolean);
-    if (names.length > 1) {
-      const wrap = $('album-filters');
-      wrap.innerHTML = ['', ...names]
-        .map((n) => `<button type="button" data-album="${esc(n)}"${n ? '' : ' class="is-on"'} aria-pressed="${n ? 'false' : 'true'}">${esc(n || 'All')}</button>`)
-        .join('');
-      wrap.hidden = false;
-      wrap.addEventListener('click', async (e) => {
-        const btn = e.target.closest('button[data-album]');
-        if (!btn || btn.dataset.album === album) return;
-        album = btn.dataset.album;
-        wrap.querySelectorAll('button').forEach((b) => {
-          b.classList.toggle('is-on', b === btn);
-          b.setAttribute('aria-pressed', String(b === btn));
-        });
-        p.reset();
-        try {
-          if (await p.next()) appear([...$('photo-list').children]);
-        } catch (err) {
-          console.info('[SEED] Could not load the album:', err.message);
-        }
-      });
-    }
-    return true;
-  }
-  function photoTile(g) {
-    const url = safeUrl(g.url);
-    if (!url) return '';
-    // the panel fills in a title from the file name ("IMG 2034"), so prefer the caption or album
-    const label = g.caption || g.album || g.title || '';
-    return `<figure class="tile"><button data-full="${esc(url)}" aria-label="${esc(label ? `Open photo: ${label}` : 'Open photo')}"><img src="${esc(url)}" alt="${esc(g.caption || g.title || '')}" loading="lazy" decoding="async" /></button>${label ? `<figcaption>${esc(label)}</figcaption>` : ''}</figure>`;
-  }
+  /* ---------- photos, with album filters (shared with the Gallery page) ---------- */
+  const loadPhotos = () =>
+    loadPhotoFeed({ list: $('photo-list'), more: $('photo-more'), filters: $('album-filters'), reduced, perPage: PER_PAGE.photos });
 
   /* ---------- videos ---------- */
   const videos = new Map();
