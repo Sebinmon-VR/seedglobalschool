@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import { initChrome } from './ui/chrome.js';
 import { initJourney } from './journey.js';
+import { initCmsSite } from './cms/site.js';
 
 /* Home: the seed-to-tree journey (loader → seed drop → growth on scroll) */
 gsap.registerPlugin(ScrollTrigger);
@@ -18,4 +19,5 @@ gsap.ticker.add((t) => lenis?.raf(t * 1000));
 
 initChrome({ lenis, reduced });
 initJourney({ lenis, reduced, intro: 'seed' });
+initCmsSite(); // replaced pictures, notice ticker and "Live now" badge from the admin panel
 window.addEventListener('load', () => ScrollTrigger.refresh());

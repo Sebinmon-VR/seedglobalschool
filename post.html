@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>News | SEED Global School</title>
+  <meta name="description" content="News from SEED Global School, Maranchery, Ponnani." />
+  <meta name="theme-color" content="#0c2f2a" />
+  <meta property="og:title" content="News | SEED Global School" />
+  <meta property="og:description" content="News from SEED Global School, Maranchery, Ponnani." />
+  <meta property="og:image" content="assets/img/gallery/honouring-ceremony.webp" />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body class="page page--post">
+<!-- @include header.html -->
+
+  <!-- One news post from the SEED Web Admin control panel: post.html?slug=... (src/cms/post.js) -->
+  <main id="main">
+    <article class="post" id="post" aria-busy="true">
+      <header class="page-hero page-hero--plain">
+        <div class="container">
+          <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><a href="news.html#news">News</a><span>/</span><span aria-current="page" id="post-crumb">Article</span></nav>
+          <p class="post__meta" id="post-meta"></p>
+          <h1 class="page-title post__title" id="post-title">Loading the article…</h1>
+          <p class="page-hero__lede post__excerpt" id="post-excerpt" hidden data-cms></p>
+        </div>
+      </header>
+      <figure class="post__cover" id="post-cover" hidden data-cms><img id="post-cover-img" alt="" /></figure>
+      <div class="section post__section">
+        <div class="container post__layout">
+          <div class="article" id="post-body"></div>
+          <aside class="post__aside" id="post-aside" hidden data-cms>
+            <p class="label">Share this story</p>
+            <a class="link-arrow" id="post-whatsapp" href="https://wa.me/" target="_blank" rel="noopener">WhatsApp</a>
+            <button class="link-arrow" type="button" id="post-copy">Copy link</button>
+            <a class="link-arrow" href="news.html#news">All news</a>
+          </aside>
+        </div>
+      </div>
+    </article>
+
+    <section class="section section--tint" id="more-news" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Keep reading</p><h2 class="section-title">More <em>news</em></h2></div>
+          <div class="section-head__text"><a class="link-arrow" href="news.html#news">All news &amp; notices</a></div>
+        </header>
+        <div class="cards3" id="more-list"></div>
+      </div>
+    </section>
+  </main>
+
+<!-- @include footer.html -->
+  <script type="module" src="/src/page.js"></script>
+</body>
+</html>

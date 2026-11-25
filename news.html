@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>News &amp; Notices | SEED Global School</title>
+  <meta name="description" content="Notices from the school office, news from SEED Global School, live streams of school events, and the latest photos and videos." />
+  <meta name="theme-color" content="#0c2f2a" />
+  <meta property="og:title" content="News &amp; Notices | SEED Global School" />
+  <meta property="og:description" content="Notices from the school office, news from SEED Global School, live streams of school events, and the latest photos and videos." />
+  <meta property="og:image" content="assets/img/gallery/honouring-ceremony.webp" />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body class="page journey-page page--news">
+  <canvas id="webgl" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+<!-- @include header.html -->
+
+  <!--
+    Everything below the two chapters comes from the SEED Web Admin control panel
+    (src/cms/news.js). Each section stays hidden until it has content.
+  -->
+  <main id="main">
+    <section class="chapter chapter--hero chapter--page" id="top" data-stage="newsHero" data-theme="light" data-side="left" data-name="News">
+      <div class="frame">
+        <div class="caption caption--hero">
+          <nav class="crumbs" aria-label="Breadcrumb" data-hero><a href="index.html">Home</a><span>/</span><span aria-current="page">News</span></nav>
+          <h1 class="display display--hero display--page" data-hero-title>
+            <span class="line">What's new</span>
+            <span class="line"><em>at SEED</em></span>
+          </h1>
+          <p class="lede" data-hero>Notices from the school office, news from our classrooms, live streams of school events, and the latest photos and videos.</p>
+          <div class="actions" data-hero>
+            <a class="btn btn--gold" id="hero-live" href="#live" hidden data-cms><span class="live-dot" aria-hidden="true"></span>Watch live</a>
+            <a class="btn btn--gold" id="hero-notices" href="#notices" data-cms>Notice board</a>
+            <a class="btn btn--outline" id="hero-news" href="#news" data-cms>Latest news</a>
+          </div>
+        </div>
+        <p class="scroll-hint" data-hero><span class="scroll-hint__line"></span>Scroll to explore</p>
+      </div>
+    </section>
+    <section class="chapter chapter--last" id="coming" data-stage="canopy" data-theme="dark" data-side="right" data-name="Coming up" data-arrive="0.2" data-leave="1">
+      <div class="frame"><div class="caption">
+        <p class="kicker"><span class="kicker__num">01</span>Coming up</p>
+        <h2 class="display" data-split>What's next <em>at SEED</em></h2>
+        <ul class="mini-levels" id="coming-up" data-reveal></ul>
+        <p class="coming__note" id="coming-note" data-reveal>From our academic calendar. Days can change each year.</p>
+        <div class="actions" data-reveal>
+          <a class="link-arrow" id="coming-all" href="#upcoming" hidden data-cms>All upcoming events</a>
+          <a class="link-arrow" id="coming-cal" href="events.html" data-cms>The month-by-month calendar</a>
+        </div>
+      </div></div>
+    </section>
+
+
+    <section class="section section--cinema" id="live" hidden data-cms>
+      <div class="container live__list" id="live-list"></div>
+    </section>
+
+    <section class="section cms-section" id="notices" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Notice board</p><h2 class="section-title" data-reveal>From the <em>school office</em></h2></div>
+          <p class="section-head__text" data-reveal>Circulars, holidays, exam dates and reminders, with the most important ones first.</p>
+        </header>
+        <ol class="notices" id="notice-list" data-reveal></ol>
+        <div class="center"><button class="btn btn--outline" type="button" id="notice-more" hidden data-cms>Older notices</button></div>
+      </div>
+    </section>
+
+    <section class="section cms-section" id="news" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Latest news</p><h2 class="section-title" data-reveal>Stories from <em>our campus</em></h2></div>
+          <p class="section-head__text" data-reveal>Achievements, celebrations and everyday moments from SEED.</p>
+        </header>
+        <div class="cards3" id="post-list" data-reveal></div>
+        <div class="center"><button class="btn btn--outline" type="button" id="post-more" hidden data-cms>More news</button></div>
+      </div>
+    </section>
+
+    <section class="section cms-section" id="upcoming" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Events</p><h2 class="section-title" data-reveal>Coming <em>up</em></h2></div>
+          <div class="section-head__text" data-reveal><p>Dates and times are in IST.</p><a class="link-arrow" href="events.html#calendar">The full year at SEED</a></div>
+        </header>
+        <ol class="cal__list events-list" id="event-list" data-reveal></ol>
+        <div class="center"><button class="btn btn--outline" type="button" id="event-more" hidden data-cms>More events</button></div>
+      </div>
+    </section>
+
+    <section class="section cms-section" id="photos" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Photos</p><h2 class="section-title" data-reveal>Fresh from <em>the camera</em></h2></div>
+          <div class="filters" id="album-filters" role="group" aria-label="Albums" hidden data-cms></div>
+        </header>
+        <div class="grid" id="photo-list" data-reveal></div>
+        <div class="center"><button class="btn btn--outline" type="button" id="photo-more" hidden data-cms>More photos</button></div>
+      </div>
+    </section>
+
+    <section class="section cms-section" id="videos" hidden data-cms>
+      <div class="container">
+        <header class="section-head">
+          <div><p class="kicker">Videos</p><h2 class="section-title" data-reveal>Watch &amp; <em>remember</em></h2></div>
+          <div class="section-head__text" data-reveal><a class="link-arrow" href="gallery.html#videos">More in the gallery</a></div>
+        </header>
+        <div class="media-row media-row--three" id="video-list" data-reveal></div>
+        <div class="center"><button class="btn btn--outline" type="button" id="video-more" hidden data-cms>More videos</button></div>
+      </div>
+    </section>
+
+    <section class="section" id="news-empty" hidden data-cms>
+      <div class="container split split--narrow">
+        <div><p class="kicker">News &amp; notices</p><h2 class="section-title" data-reveal>Fresh news is <em>on its way</em></h2></div>
+        <div class="prose">
+          <p data-reveal>Notices, news and live streams from the school will appear here. Meanwhile, see what's coming up in our calendar, or follow SEED on social media.</p>
+          <div class="actions" data-reveal>
+            <a class="btn btn--gold" href="events.html">Events calendar</a>
+            <a class="link-arrow" href="https://www.instagram.com/seedglobalschool/" target="_blank" rel="noopener">Instagram</a>
+            <a class="link-arrow" href="https://www.facebook.com/seedglobalschool" target="_blank" rel="noopener">Facebook</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+<!-- @include footer.html -->
+  <script type="module" src="/src/page.js"></script>
+</body>
+</html>

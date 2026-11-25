@@ -79,7 +79,7 @@
         <div>
           <p class="kicker">Enquire</p>
           <h2 class="section-title" data-split>Start your child's <em>SEED story</em></h2>
-          <p class="lead" data-reveal>Tell us a little about your child. We'll continue the conversation on WhatsApp, or call us any time.</p>
+          <p class="lead" data-reveal>Tell us a little about your child and our admissions team will call you back. Or call us any time.</p>
           <ul class="contact-list" data-reveal>
             <li><span>Call</span><a href="tel:+918593990033">+91 85939 90033</a></li>
             <li><span>Email</span><a href="mailto:contact@seedglobalschool.com">contact@seedglobalschool.com</a></li>
@@ -87,13 +87,13 @@
           </ul>
         </div>
         <div class="form-card" data-reveal>
-            <form class="enquiry" novalidate data-intro="I would like to enquire about admission.">
+            <form class="enquiry" novalidate data-intro="I would like to enquire about admission." data-source="Website · Admissions">
               <div class="enquiry__row">
                 <label><span>Your name</span><input name="parent" required autocomplete="name" /></label>
                 <label><span>Phone</span><input name="phone" required type="tel" autocomplete="tel" inputmode="tel" placeholder="+91" /></label>
               </div>
               <div class="enquiry__row">
-                <label><span>Child's name <em>(optional)</em></span><input name="child" /></label>
+                <label><span>Child's name</span><input name="child" required /></label>
                 <label><span>Programme</span>
                   <select name="program" required>
                     <option value="">Choose a programme</option>
@@ -106,6 +106,7 @@
                 </label>
               </div>
               <label><span>Message <em>(optional)</em></span><textarea name="message" rows="3"></textarea></label>
+              <label class="enquiry__trap" aria-hidden="true">Leave this empty<input name="website" tabindex="-1" autocomplete="off" /></label>
               <button class="btn btn--gold" type="submit">Send enquiry</button>
               <p class="enquiry__status" role="status" aria-live="polite"></p>
             </form>

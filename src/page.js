@@ -7,8 +7,9 @@ import { initLightbox } from './ui/lightbox.js';
 import { initForms, initTabs } from './ui/forms.js';
 import { initMedia } from './ui/media.js';
 import { initJourney } from './journey.js';
+import { initCmsSite } from './cms/site.js';
 
-/* Inner pages: About, Academics, Admissions, Events, Gallery, Contact, Disclosure */
+/* Inner pages: About, Academics, Admissions, Events, News, Gallery, Contact, Disclosure, articles */
 gsap.registerPlugin(ScrollTrigger, SplitText);
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -31,10 +32,19 @@ const scrollToEl = (el) => {
 
 initChrome({ lenis, reduced });
 const journey = hasJourney ? initJourney({ lenis, reduced, intro: 'fade' }) : null;
-const { openVideo } = initLightbox({ lenis });
+const { openVideo, openFrame, openFile } = initLightbox({ lenis });
 initForms();
 initTabs(reduced);
 initMedia({ reduced, openVideo, scrollToEl });
+
+// content managed in the SEED Web Admin panel (src/cms/)
+initCmsSite();
+if (document.body.classList.contains('page--news')) {
+  import('./cms/news.js').then(({ initNews }) => initNews({ reduced, openFrame, openFile, scrollToEl }));
+}
+if (document.body.classList.contains('page--post')) {
+  import('./cms/post.js').then(({ initPost }) => initPost());
+}
 
 // same-page anchors scroll smoothly
 document.querySelectorAll('a[href*="#"]').forEach((a) => {

@@ -3,7 +3,7 @@ import gsap from 'gsap';
 /** Full-screen viewer for gallery photos, prize posters and videos. */
 export function initLightbox({ lenis }) {
   const box = document.getElementById('lightbox');
-  if (!box) return { openVideo: () => {} };
+  if (!box) return { openVideo: () => {}, openFrame: () => {}, openFile: () => {} };
   const stage = box.querySelector('.lightbox__stage');
   const caption = box.querySelector('.lightbox__caption');
   let shots = [];
@@ -41,17 +41,33 @@ export function initLightbox({ lenis }) {
         lastFocus?.focus();
       },
     });
-  const openVideo = (id, title = '') =>
+  /** Any embeddable player (YouTube, Vimeo, Facebook). */
+  const openFrame = (src, title = '') =>
     open(() => {
       box.classList.add('is-video');
       const f = document.createElement('iframe');
-      f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+      f.src = src;
       f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
       f.allowFullscreen = true;
       f.title = title;
       stage.replaceChildren(f);
       caption.textContent = title;
     });
+  /** A video file uploaded to the admin panel. */
+  const openFile = (src, title = '', poster = null) =>
+    open(() => {
+      box.classList.add('is-video');
+      const v = document.createElement('video');
+      v.src = src;
+      v.controls = true;
+      v.autoplay = true;
+      v.playsInline = true;
+      if (poster) v.poster = poster;
+      v.setAttribute('aria-label', title);
+      stage.replaceChildren(v);
+      caption.textContent = title;
+    });
+  const openVideo = (id, title = '') => openFrame(`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`, title);
 
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.tile button[data-full], .poster button[data-full]');
@@ -71,5 +87,5 @@ export function initLightbox({ lenis }) {
       if (e.key === 'ArrowLeft') showImage(idx - 1);
     }
   });
-  return { openVideo };
+  return { openVideo, openFrame, openFile };
 }

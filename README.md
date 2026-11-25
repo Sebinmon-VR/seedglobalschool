@@ -38,6 +38,8 @@ To deploy, upload the contents of `dist/` to any static host.
 | Academics | `academics.html` | Pre-Primary, Primary and Upper Primary, curriculum, SEED Smile, SEED Aspire, MTTC, campus |
 | Admissions | `admissions.html` | Who can apply, the 4 steps, fee and calendar documents, enquiry form |
 | Events | `events.html` | Month-by-month calendar and signature celebrations |
+| News & Notices | `news.html` | Live stream, notice board, news posts, upcoming events, photos and videos, all from the admin panel |
+| Article | `post.html?slug=…` | One news post from the admin panel, with share links and "More news" |
 | Gallery | `gallery.html` | Filterable photo gallery, prize-winner posters, video player |
 | Contact | `contact.html` | Address, phones and email, map, message form, careers |
 | Disclosure | `disclosure.html` | CBSE Mandatory Public Disclosure |
@@ -55,6 +57,34 @@ The header, full-screen menu and footer are shared. They live in `partials/heade
 | Videos | `#episodes` list in `gallery.html` (YouTube IDs + thumbnails) |
 | CBSE documents | `public/docs/` + `disclosure.html` |
 | Styles | `src/styles/main.css` (deep green, ivory and gold; Playfair Display + Inter) |
+| **News, notices, live, events, photos, videos** | The admin panel (see below). No code changes needed |
+| **Replacing any picture** | The admin panel: **Website images** |
+
+## Admin panel (SEED Web Admin)
+
+Day-to-day content is managed in the SEED Web Admin control panel ([github.com/Sebinmon-VR/seedwebadmin](https://github.com/Sebinmon-VR/seedwebadmin)), at `https://seedwebadmin.azurewebsites.net`. The site reads the panel's public API in the browser; the code is in `src/cms/`.
+
+| In the panel | On the website |
+|---|---|
+| **Posts** | News page cards, and `post.html?slug=…` for each article |
+| **Notices** | News page notice board (pinned and urgent first, attachments). Notices marked *Show in ticker* scroll in the top bar on every page (wide screens) |
+| **Events & live** | News page "Coming up" chapter and events list. While an event is live (**Go live**, or between its start and end), a *Live now* badge shows near the top of every page and the stream plays on the News page |
+| **Photo gallery**, **Videos** | News page photos (with album filters) and videos (YouTube, Vimeo, Facebook or uploaded files) |
+| **Website images** | Every picture built into the site. A replaced picture shows on every page that uses it; *Reset* brings back the original |
+| **Enquiries** | The Admissions and Contact forms post here (source "Website · Admissions" / "Website · Contact") |
+
+**Setup (once):**
+
+1. In Azure (the panel's Web App → Settings → Environment variables), set `ALLOWED_ORIGINS` to every address the website is served from, for example `https://sebinmon-vr.github.io,https://www.seedglobalschool.com,https://seedglobalschool.com`. Until then the browser blocks the site from reading the panel.
+2. In the panel, go to **Website settings → Website address** and enter where the website lives, for example `https://sebinmon-vr.github.io/seedglobalschool`. **Website images** reads the list of pictures from `<website address>/site-images.json`.
+
+**How it fits together:**
+
+- `npm run build` writes `dist/site-images.json`, listing every picture under `public/assets/img/` that a page uses, with where it appears. It is generated from the HTML (see `vite.config.js`), so new pictures show up in the panel automatically after the next deploy.
+- On each page load the site makes one request to the panel (`/api/public/home`) for the ticker, live events and replaced pictures (`src/cms/site.js`). The News and article pages load their own lists (`src/cms/news.js`, `src/cms/post.js`).
+- If the panel can't be reached, the site still works: built-in pictures stay, the News page shows a "coming soon" note and "Coming up" uses `src/data/events.js`, and the forms offer WhatsApp instead.
+- The panel's address is set in `src/cms/api.js`. To use another one, build with `VITE_CMS_URL=https://… npm run build`. Set it to an empty string to switch the connection off (the forms then open WhatsApp, as before).
+- To work against a local copy of the panel: run it with `ALLOWED_ORIGINS=http://localhost:5173` and start the site with `VITE_CMS_URL=http://localhost:4000 npm run dev`.
 
 ## Children characters (planting → growing up)
 
@@ -94,4 +124,4 @@ Add `?debug` to the URL to get `__world`, `__director` and `__lenis` in the brow
 - **Key personnel photos:** check that each photo matches the right name (see `NOTE` in `about.html`).
 - **Admission steps:** the four steps are a suggested journey.
 - **Calendar:** events are taken from the 2025–26 academic calendar. Update `src/data/events.js` when the 2026–27 calendar is out.
-- **Enquiry form:** it opens WhatsApp with a pre-filled message. It can be connected to email or a CRM.
+- **Enquiry forms:** they go to the admin panel's Enquiries inbox. If the panel can't be reached, the visitor is offered the same message on WhatsApp. The Admissions form now asks for the child's name (the inbox needs a student name); on the Contact form it stays optional and is saved as "General enquiry" when left empty.

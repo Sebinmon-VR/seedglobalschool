@@ -110,6 +110,12 @@ Object.assign(STAGES, {
     skyTop: '#0f1730', skyBottom: '#a65a4e', sunColor: '#ffb48a', hemiSky: '#8da7d6', hemiGround: '#2a1d18',
     sun: 2.0, hemi: 0.95, sunGlow: 1.0, stars: 0.8, fireflies: 0.9, pollen: 0.2, fill: 1.4,
   },
+  // News: the grown tree on a bright, breezy morning, the day's news in the air
+  newsHero: {
+    ...DAY, tx: 0, ty: 4.6, tz: 0, dist: 15, az: 52, el: 15, shift: 0.24,
+    grow: 1, roots: 1, leaves: 1, bloom: 0, fruit: 0, age: 0.6,
+    skyTop: '#c4dfec', skyBottom: '#f7f3e6', sunColor: '#fff4d6', hemiSky: '#eaf6ff', pollen: 1, wind: 1.1,
+  },
 });
 
 const COLOR_KEYS = ['skyTop', 'skyBottom', 'sunColor', 'hemiSky', 'hemiGround'];
